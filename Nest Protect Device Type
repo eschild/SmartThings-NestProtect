@@ -69,6 +69,7 @@
  *
  *	Version: 1.0 - Initial Nickh Bailey Version
  *	Version: 1.1 - Cleaned up code, fixed "unknown" error for andriod devices, updated authentication, layout, and logging.
+ *	Version: 1.2 - Converted Battery to integer because that is what Low Battery Handler Smart App in Hello Home expects it to be
  */
 
 preferences {
@@ -79,7 +80,7 @@ preferences {
 
  // for the UI
 metadata {
-	definition (name: "Nest Protect", author: "dianoga7@3dgo.net", namespace: "sidjohn1") {
+	definition (name: "Nest Protect", author: "dianoga7@3dgo.net", namespace: "eschild") {
 		capability "Polling"
 		capability "Battery"
 		capability "Smoke Detector"
@@ -111,8 +112,8 @@ metadata {
 		}
 		standardTile("battery", "device.battery", width: 1, height: 1) {
 			state ("default", label:'unknown', icon: "st.unknown.unknown.unknown")
-			state("ok", label: "Battery: OK", backgroundColor: "#44B621")
-			state("low", label: "Battery: Low", backgroundColor: "#e86d13")
+			state("100", label: "Battery: OK", backgroundColor: "#44B621")
+			state("10", label: "Battery: Low", backgroundColor: "#e86d13")
 		}
 		standardTile("refresh", "device.smoke", width: 1, height: 1, inactiveLabel: false, canChangeIcon: false, decoration: "flat") {
 			state("default", label:'refresh', action:"polling.poll", icon:"st.secondary.refresh-icon")
@@ -136,7 +137,7 @@ def poll() {
         data.topaz = it.data.topaz.getAt(settings.mac.toUpperCase())
         data.topaz.smoke_status = data.topaz.smoke_status == 0 ? 'clear' : 'detected'
         data.topaz.co_status = data.topaz.co_status == 0 ? 'clear' : 'detected'
-        data.topaz.battery_health_state = data.topaz.battery_health_state  == 0 ? 'ok' : 'low'
+        data.topaz.battery_health_state = data.topaz.battery_health_state  == 0 ? '100' : '10'
 
         sendEvent(name: 'smoke', value: data.topaz.smoke_status, descriptionText: "${device.displayName} smoke ${data.topaz.smoke_status}!", displayed: false)
         sendEvent(name: 'carbonMonoxide', value: data.topaz.co_status, descriptionText: "${device.displayName} carbon monoxide ${data.topaz.co_status}!", displayed: false)
@@ -239,7 +240,7 @@ def isLoggedIn() {
 }
 
 private def textVersion() {
-    def text = "Version 1.1"
+    def text = "Version 1.2"
 }
 
 private def textCopyright() {
